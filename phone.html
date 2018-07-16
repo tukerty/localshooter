@@ -1,0 +1,339 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
+    <title>Socket.IO chat</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            background-color: #2c3e50
+        }
+
+        .login {
+            text-align: center;
+            color: #FFF
+        }
+
+        .controller {
+            height: 100vh;
+            width: 100vw;
+            background-color: #2c3e50
+        }
+
+        .spinner-container {
+            height: 100vh;
+            width: 100vw;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login {
+            position: absolute;
+            height: 100vh;
+            width: 100vw;
+            top: 0;
+            left: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+
+        }
+
+        .login input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #FFF;
+            text-align: center;
+            color: #FFF;
+            font-size: 2em;
+        }
+
+        .login input:focus {
+            border: none;
+            border-bottom: 1px solid #FFF;
+            outline: none
+        }
+
+        .sk-cube-grid {
+            width: 80px;
+            height: 80px;
+            margin: 100px auto;
+        }
+
+        .sk-cube-grid .sk-cube {
+            width: 33%;
+            height: 33%;
+            background-color: #FFF;
+            float: left;
+            -webkit-animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
+            animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
+        }
+
+        .sk-cube-grid .sk-cube1 {
+            -webkit-animation-delay: 0.2s;
+            animation-delay: 0.2s;
+        }
+
+        .sk-cube-grid .sk-cube2 {
+            -webkit-animation-delay: 0.3s;
+            animation-delay: 0.3s;
+        }
+
+        .sk-cube-grid .sk-cube3 {
+            -webkit-animation-delay: 0.4s;
+            animation-delay: 0.4s;
+        }
+
+        .sk-cube-grid .sk-cube4 {
+            -webkit-animation-delay: 0.1s;
+            animation-delay: 0.1s;
+        }
+
+        .sk-cube-grid .sk-cube5 {
+            -webkit-animation-delay: 0.2s;
+            animation-delay: 0.2s;
+        }
+
+        .sk-cube-grid .sk-cube6 {
+            -webkit-animation-delay: 0.3s;
+            animation-delay: 0.3s;
+        }
+
+        .sk-cube-grid .sk-cube7 {
+            -webkit-animation-delay: 0s;
+            animation-delay: 0s;
+        }
+
+        .sk-cube-grid .sk-cube8 {
+            -webkit-animation-delay: 0.1s;
+            animation-delay: 0.1s;
+        }
+
+        .sk-cube-grid .sk-cube9 {
+            -webkit-animation-delay: 0.2s;
+            animation-delay: 0.2s;
+        }
+
+        @-webkit-keyframes sk-cubeGridScaleDelay {
+            0%,
+            70%,
+            100% {
+                -webkit-transform: scale3D(1, 1, 1);
+                transform: scale3D(1, 1, 1);
+            }
+            35% {
+                -webkit-transform: scale3D(0, 0, 1);
+                transform: scale3D(0, 0, 1);
+            }
+        }
+
+        @keyframes sk-cubeGridScaleDelay {
+            0%,
+            70%,
+            100% {
+                -webkit-transform: scale3D(1, 1, 1);
+                transform: scale3D(1, 1, 1);
+            }
+            35% {
+                -webkit-transform: scale3D(0, 0, 1);
+                transform: scale3D(0, 0, 1);
+            }
+        }
+
+        #startlink {
+            background: transparent;
+            border: 1px solid #FFF;
+            text-align: center;
+            color: #FFF;
+            font-size: 2em;
+            margin-top: 20px;
+        }
+
+        .controls {
+            text-align: center;
+            position: absolute;
+            height: 100vh;
+            width: 100vw;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+        .buttonFire{
+            position: absolute;
+            bottom: 25vh;
+            right: 25vh;
+            height: 50vh;
+            width: 50vh;
+            background: rgba(255, 0, 0, 0.25);
+            border-radius: 100%;
+            
+        }
+        .stick{
+            position: absolute;
+            bottom: 25vh;
+            left: 25vh;
+            height: 50vh;
+            width: 50vh;
+            background: rgba(255,255,255,0.25);
+            border-radius: 100%;
+            
+        }
+        .stickHead{
+            position: absolute;
+            background: rgba(255,255,255,0.5);
+            border-radius: 100%;
+            height: 10vh;
+            width: 10vh;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="spinner-container">
+        <div class="sk-cube-grid">
+            <div class="sk-cube sk-cube1"></div>
+            <div class="sk-cube sk-cube2"></div>
+            <div class="sk-cube sk-cube3"></div>
+            <div class="sk-cube sk-cube4"></div>
+            <div class="sk-cube sk-cube5"></div>
+            <div class="sk-cube sk-cube6"></div>
+            <div class="sk-cube sk-cube7"></div>
+            <div class="sk-cube sk-cube8"></div>
+            <div class="sk-cube sk-cube9"></div>
+        </div>
+    </div>
+
+    <div class="login">
+        <form id="linkFrom" class="form">
+            <h2>ENTER CODE</h2>
+            <input id="code" type="number">
+            <button type="submit" id="startlink">START LINK</button>
+        </form>
+    </div>
+
+    <div class="controls">
+            <div class="stick">
+                <div class="stickHead">
+
+                </div>
+            </div>
+            <div class="buttonFire">
+
+            </div>
+    </div>
+    <script src="/script/socket.io-1.2.0.js"></script>
+    <script src="/script/jquery-3.3.1.min.js"></script>
+    <script>
+        let socket = io('192.168.0.101:3000');
+        let myRoom = ''
+        let stick = {
+            x:0,
+            y:0,
+            hx: 0,
+            hy: 0,
+            angle: -1
+        }
+        $(document).ready(() => {
+            $('.login').css("display", "flex").hide()
+
+            $('.stickHead').css('left', 100)
+
+            setTimeout(() => {
+                $('.spinner-container').fadeOut(() => {
+                    $('.login').fadeIn()
+                })
+            }, 1000)
+
+            $('#linkFrom').submit(e => {
+                document.body.webkitRequestFullscreen();
+                screen.orientation.lock('landscape');
+                e.preventDefault()
+                console.log($('#code').val())
+                myRoom = $('#code').val()
+                socket.emit('setControllerRoom', $('#code').val())
+                $('.login').fadeOut(() => {
+                    $('.controls').fadeIn()
+                stick.x = $('.stick').offset().left + $('.stick').width() / 2
+                stick.y = $('.stick').offset().top + $('.stick').height() / 2
+                })
+            })
+
+            $('.stick').on('touchstart', (e) => {
+                stick.hx = e.targetTouches[0].screenX
+                stick.hy = e.targetTouches[0].screenY
+                setHeadPosition()
+            })
+            $('.stick').on('touchmove', (e) => {
+                stick.hx = e.targetTouches[0].screenX
+                stick.hy = e.targetTouches[0].screenY
+                setHeadPosition()
+            })
+            $('.stick').on('touchend', (e) => {
+                stick.hx = stick.x
+                stick.hy = stick.y
+                resetHeadPosition()
+            })
+            $('.stick').on('touchcancel', (e) => {
+                stick.hx = stick.x
+                stick.hy = stick.y
+                resetHeadPosition()
+            })
+
+            $('.buttonFire').on('touchstart', (e) => {
+                $('.buttonFire').css('background', 'rgba(255, 0, 0, 0.5)')
+            })
+            $('.buttonFire').on('touchend', (e) => {
+                $('.buttonFire').css('background', 'rgba(255, 0, 0, 0.25)')
+            })
+            $('.buttonFire').on('touchcancel', (e) => {
+                $('.buttonFire').css('background', 'rgba(255, 0, 0, 0.25)')
+            })
+
+
+
+            function setHeadPosition(){
+                $('.stickHead').css('left', stick.hx - $('.stickHead').width() / 2 - $('.stick').width() / 2 )
+                $('.stickHead').css('top',  stick.hy - $('.stickHead').height() / 2 - $('.stick').height() / 2 )
+                calculateAngle()
+            }
+
+            function resetHeadPosition(){
+                $('.stickHead').css('left', $('.stick').width() / 2 - $('.stickHead').width() / 2)
+                $('.stickHead').css('top',  $('.stick').height() / 2 - $('.stickHead').height() / 2)
+                calculateAngle()
+            }
+
+            function calculateAngle(){
+                if (stick.hx > stick.x && stick.hy < stick.y){
+                    stick.angle = 90 - Math.atan(Math.abs(stick.x - stick.hx) / Math.abs(stick.y - stick.hy)) * 180 / Math.PI
+                }
+                if (stick.hx <= stick.x && stick.hy < stick.y){
+                    stick.angle = 90 + Math.atan(Math.abs(stick.x - stick.hx) / Math.abs(stick.y - stick.hy)) * 180 / Math.PI
+                }
+                if (stick.hx <= stick.x && stick.hy >= stick.y){
+                    stick.angle = 270 - Math.atan(Math.abs(stick.x - stick.hx) / Math.abs(stick.y - stick.hy)) * 180 / Math.PI
+                }
+                if (stick.hx > stick.x && stick.hy >= stick.y){
+                    stick.angle = 270 + Math.atan(Math.abs(stick.x - stick.hx) / Math.abs(stick.y - stick.hy)) * 180 / Math.PI
+                }
+                if (isNaN(stick.angle)){
+                    stick.angle = -1
+                }
+                console.log(stick)
+                socket.emit('controllerPlayerMove', stick.angle)
+            }
+        })
+    </script>
+</body>
+
+</html>
